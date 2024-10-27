@@ -65,8 +65,7 @@ public class UserController {
 
  @GetMapping("/image/{imageName}")
 public ResponseEntity<org.springframework.core.io.Resource> getImage(@PathVariable String imageName) {
-    // Assuming images are stored in src/main/resources/uploads directory
-    Path imagePath = Paths.get("src/main/resources/uploads").resolve(imageName);
+    Path imagePath = Paths.get("src/main/resources/upload").resolve(imageName);
     try {
         org.springframework.core.io.Resource resource = new UrlResource(imagePath.toUri());
         if (resource.exists() || resource.isReadable()) {

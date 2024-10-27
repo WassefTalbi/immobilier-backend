@@ -38,6 +38,7 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MailToken> mailTokens;
     @OneToMany(mappedBy = "angency",cascade = {CascadeType.PERSIST,CascadeType.REMOVE})
+    @JsonIgnore
     private List<Property>properties;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -10,10 +10,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
 @RequestMapping("/properties")
+@CrossOrigin("*")
 @RequiredArgsConstructor
 public class PropertyController {
     private final PropertyService propertyService;
@@ -33,9 +35,8 @@ public class PropertyController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> saveProperty(@ModelAttribute PropertyDTO propertyDTO, @AuthenticationPrincipal Authentication authenticationPrincipal) {
-
-            return new ResponseEntity<>(propertyService.saveProperty(propertyDTO,authenticationPrincipal), HttpStatus.CREATED);
+    public ResponseEntity<?> saveProperty(@ModelAttribute PropertyDTO propertyDTO, Principal principal) {
+            return new ResponseEntity<>(propertyService.saveProperty(propertyDTO,principal.getName()), HttpStatus.CREATED);
     }
 
 

@@ -1,8 +1,7 @@
 package OneWayDev.tn.OneWayDev;
 
-import OneWayDev.tn.OneWayDev.entity.Role;
-import OneWayDev.tn.OneWayDev.entity.User;
-import OneWayDev.tn.OneWayDev.entity.RoleType;
+import OneWayDev.tn.OneWayDev.Repository.FeatureRepository;
+import OneWayDev.tn.OneWayDev.entity.*;
 import OneWayDev.tn.OneWayDev.Repository.RoleRepository;
 import OneWayDev.tn.OneWayDev.Repository.UserRepository;
 import OneWayDev.tn.OneWayDev.config.RsakeysConfig;
@@ -21,6 +20,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class OneWayDevApplication implements CommandLineRunner {
 	private  final RoleRepository roleRepository;
+	private final FeatureRepository featureRepository;
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 	public static void main(String[] args) {
@@ -29,23 +29,41 @@ public class OneWayDevApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-     /*   Stream.of(RoleType.ADMIN, RoleType.USER)
-            .forEach(roleType -> {
-               Role role= new Role();
-               role.setRoleType(roleType);
-               roleRepository.save(role);
-            });
-       User admin=new User();
-        Role role=roleRepository.findByRoleType(RoleType.ADMIN).get();
-        admin.setFirstName("admin");
-        admin.setLastName("admin");
-        admin.setEmail("admin@1waydev.tn");
-        admin.setPhone("28598395");
-        admin.setRoles(List.of(role));
-        admin.setEnabled(true);
-        admin.setNonLocked(true);
-        admin.setPassword(passwordEncoder.encode("adminADMIN#1919"));
-       userRepository.save(admin);
-      */
+
+
+		if (featureRepository.count() == 0) {
+			Stream.of(FeatureType.electricity, FeatureType.balcony, FeatureType.internet,
+					FeatureType.airConditioning, FeatureType.nearGreenZone, FeatureType.nearSchool,
+					FeatureType.parkingAvailable, FeatureType.swimmingPool, FeatureType.nearShop).forEach(
+					featureType -> {
+						Feature feature = new Feature();
+						feature.setFeatureName(featureType);
+						featureRepository.save(feature);
+
+					}
+			);
+
+		}
+
+		if (roleRepository.count() == 0) {
+			Stream.of(RoleType.ADMIN, RoleType.USER)
+					.forEach(roleType -> {
+						Role role = new Role();
+						role.setRoleType(roleType);
+						roleRepository.save(role);
+					});
+			User admin = new User();
+			Role role = roleRepository.findByRoleType(RoleType.ADMIN).get();
+			admin.setFirstName("admin");
+			admin.setLastName("admin");
+			admin.setEmail("admin@1waydev.tn");
+			admin.setPhone("28598395");
+			admin.setRoles(List.of(role));
+			admin.setEnabled(true);
+			admin.setNonLocked(true);
+			admin.setPassword(passwordEncoder.encode("adminADMIN#1919"));
+			userRepository.save(admin);
+
+		}
 	}
 }

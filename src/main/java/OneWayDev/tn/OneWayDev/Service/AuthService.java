@@ -137,7 +137,7 @@ public class AuthService {
         JwtClaimsSet jwtClaimsSet=JwtClaimsSet.builder()
                 .subject(subject)
                 .issuedAt(instant)
-                .expiresAt(instant.plus(withRefreshToken?15:20, ChronoUnit.MINUTES))
+                .expiresAt(instant.plus(withRefreshToken?3200:3100, ChronoUnit.MINUTES))
                 .issuer("security-service")
                 .claim("scope",scope)
                 .build();
