@@ -1,6 +1,9 @@
 package OneWayDev.tn.OneWayDev.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,6 +17,8 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+
 public class Property {
 
     @Id
@@ -31,6 +36,7 @@ public class Property {
     private LocalDate createDate;
     private LocalDate updateDate;
     @ManyToOne
+
     private User angency;
 
     @ManyToMany
