@@ -1,8 +1,15 @@
 package OneWayDev.tn.OneWayDev.controller;
 
+import OneWayDev.tn.OneWayDev.dto.request.AgencyRequest;
+import OneWayDev.tn.OneWayDev.dto.request.AgencyRequestManage;
+import OneWayDev.tn.OneWayDev.dto.request.ClientRegisterRequest;
+import OneWayDev.tn.OneWayDev.dto.request.CustomErrorResponse;
 import OneWayDev.tn.OneWayDev.entity.User;
 import OneWayDev.tn.OneWayDev.Repository.UserRepository;
 import OneWayDev.tn.OneWayDev.Service.UserService;
+import OneWayDev.tn.OneWayDev.exception.EmailExistsExecption;
+import OneWayDev.tn.OneWayDev.exception.NotFoundExecption;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
@@ -19,7 +26,7 @@ import java.util.Map;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("user/")
+@RequestMapping("user")
 @CrossOrigin("*")
 @Validated
 public class UserController {
@@ -31,17 +38,55 @@ public class UserController {
     public User getUserByEmail(@PathVariable(value = "email") String email){
         return userService.getUserByEmail(email);
     }
-
-
-    @GetMapping("/all")
-    public List<User> getAllUsers(){
-        return userService.getAllUsers();
+    @GetMapping("/findById/{idUser}")
+    public User findUserById(@PathVariable(value = "idUser") Long idUser){
+        return userService.findUserById(idUser);
     }
-
+    @PostMapping("/register-agency")
+    public ResponseEntity<?> registerAgency(@ModelAttribute @Valid AgencyRequest registerRequestDTO){
+        try {
+            return new ResponseEntity<>(userService.registerAgency(registerRequestDTO), HttpStatus.CREATED);
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(new CustomErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PutMapping("/manage-agence/{idUser}")
+    public ResponseEntity<?> manageAgence(@PathVariable(value = "idUser") Long idUser,@ModelAttribute @Valid AgencyRequestManage registerRequestDTO){
+        try {
+            return new ResponseEntity<>(userService.manageAgence(idUser,registerRequestDTO), HttpStatus.OK);
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(new CustomErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @GetMapping("/all-agency")
+    public List<User> getAllAgency(){
+        return userService.findAllAgencies();
+    }
+    @GetMapping("/all-client")
+    public List<User> getAllClient(){
+        return userService.findAllClient();
+    }
+    @DeleteMapping("/delete/{idUser}")
+    public ResponseEntity<Map<String, String>> removeCategorie(@PathVariable Long idUser) {
+        Map<String, String> response = new HashMap<>();
+        try {
+            userService.deleteUser(idUser);
+            response.put("message", "user dropped successfully");
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (NotFoundExecption e) {
+            response.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+        }
+    }
     @PutMapping("/block/{id}")
     public User blockUser(@PathVariable(value = "id") Long idUser){
         return userService.blockedUser(idUser, false);
     }
+
 
     @PutMapping("/unblock/{id}")
     public User unblockUser(@PathVariable(value = "id") Long idUser){

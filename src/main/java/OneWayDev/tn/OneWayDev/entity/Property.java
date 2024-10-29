@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.List;
 @Entity
 @Getter
@@ -27,11 +28,20 @@ public class Property {
     private String requirement;
     private String location;
     private String image;
+    private LocalDate createDate;
+    private LocalDate updateDate;
     @ManyToOne
     private User angency;
 
     @ManyToMany
     private List<Feature> features;
-
+    @PrePersist
+    public void prePersist() {
+        this.createDate = LocalDate.now();
+    }
+    @PreUpdate
+    public void preUpdate() {
+        this.updateDate = LocalDate.now();
+    }
 
 }

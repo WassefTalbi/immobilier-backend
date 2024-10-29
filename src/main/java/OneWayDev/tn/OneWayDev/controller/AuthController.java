@@ -3,6 +3,7 @@ package OneWayDev.tn.OneWayDev.controller;
 import OneWayDev.tn.OneWayDev.Service.AuthService;
 import OneWayDev.tn.OneWayDev.Service.MailConfirmationService;
 import OneWayDev.tn.OneWayDev.dto.request.AuthenticationRequest;
+import OneWayDev.tn.OneWayDev.dto.request.ClientRegisterRequest;
 import OneWayDev.tn.OneWayDev.dto.request.CustomErrorResponse;
 import OneWayDev.tn.OneWayDev.dto.request.RegisterRequest;
 import OneWayDev.tn.OneWayDev.exception.EmailExistsExecption;
@@ -31,10 +32,10 @@ public class AuthController {
     private AuthService authenticationService;
     private final MailConfirmationService mailConfirmationService;
 
-    @PostMapping("/register")
-    public ResponseEntity<?> registerStudent(@RequestBody @Valid RegisterRequest registerRequestDTO){
+    @PostMapping("/register-client")
+    public ResponseEntity<?> registerClient(@ModelAttribute @Valid ClientRegisterRequest registerRequestDTO){
         try {
-            return new ResponseEntity<>(authenticationService.register(registerRequestDTO), HttpStatus.CREATED);
+            return new ResponseEntity<>(authenticationService.registerClient(registerRequestDTO), HttpStatus.CREATED);
         }
         catch (EmailExistsExecption e){
             return new ResponseEntity<>(new CustomErrorResponse(HttpStatus.CONFLICT.value(), e.getMessage()), HttpStatus.CONFLICT);
@@ -44,7 +45,7 @@ public class AuthController {
             return new ResponseEntity<>(new CustomErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @GetMapping( "/confirm")
+   @GetMapping( "/confirm")
     public String confirm(@RequestParam("token") String token) {
         return mailConfirmationService.confirmToken(token);
     }

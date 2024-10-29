@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,6 +24,7 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
     String email;
+    @JsonIgnore
     String password;
     String firstName;
     String lastName;
@@ -30,6 +32,10 @@ public class User implements UserDetails {
     private Boolean nonLocked;
     private Boolean enabled;
     private String photoProfile;
+    private Integer sinceYear;
+    private String description;
+    private String name;
+    private String Address;
 
     @ManyToMany
     @JsonIgnore

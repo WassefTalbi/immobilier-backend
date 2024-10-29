@@ -1,5 +1,6 @@
 package OneWayDev.tn.OneWayDev.Service;
 
+import OneWayDev.tn.OneWayDev.dto.request.ClientRegisterRequest;
 import OneWayDev.tn.OneWayDev.entity.MailToken;
 import OneWayDev.tn.OneWayDev.entity.Role;
 import OneWayDev.tn.OneWayDev.entity.User;
@@ -41,10 +42,10 @@ public class AuthService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder bCryptPasswordEncoder;
-
     private final EmailService emailService;
     private final MailConfirmationService mailConfirmationService;
     private  final MailTokenService mailTokenService;
+    private final FileService fileService;
 
     @Value("${infobip.base-url}")
     private String INFOBIP_BASE_URL ;
@@ -54,7 +55,7 @@ public class AuthService {
 
     @Value("${infobip.sender-name}")
     private String INFOBIP_SENDER_NAME ;
-    public User register(RegisterRequest registerRequestDTO) {
+    public User registerClient(ClientRegisterRequest registerRequestDTO) {
         try{
             if(userRepository.findByEmail(registerRequestDTO.getEmail()).isPresent()){
                 throw new EmailExistsExecption("Email already exists");
@@ -84,8 +85,8 @@ public class AuthService {
             emailService.sendEmail(
                     registerRequestDTO.getEmail(),
                     mailConfirmationService.buildEmail(registerRequestDTO.getFirstName(), link));
-          //  String photoName= uploadFile(registerRequestDTO.getPhotoProfile());
-            //user.setPhotoProfile(photoName);
+            String photoName=fileService.uploadFile(registerRequestDTO.getPhotoProfile());
+            user.setPhotoProfile(photoName);
             return userRepository.save(user);
         }catch (MailSendException mailSendException){
             throw new MailSendException("Sorry, we couldn't send your email at the moment. Please try again later ");
