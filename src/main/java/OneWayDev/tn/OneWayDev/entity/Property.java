@@ -17,7 +17,6 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 
 public class Property {
 
@@ -36,7 +35,7 @@ public class Property {
     private LocalDate createDate;
     private LocalDate updateDate;
     @ManyToOne
-
+    @JsonIgnore
     private User angency;
 
     @ManyToMany

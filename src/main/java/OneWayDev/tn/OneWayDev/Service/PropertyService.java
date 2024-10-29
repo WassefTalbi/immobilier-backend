@@ -28,6 +28,9 @@ public class PropertyService {
     public List<Property> getAllProperties() {
         return propertyRepository.findAll();
     }
+    public List<Property> getPropertiesByAgency(String email) {
+        return propertyRepository.findByAngencyEmail(email);
+    }
     public Property getPropertyById(Long id) {
         return propertyRepository.findById(id).orElseThrow(()->new NotFoundExecption("property not found"));
     }
