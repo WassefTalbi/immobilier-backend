@@ -28,7 +28,7 @@ public class PropertyController {
         return new ResponseEntity<>(properties, HttpStatus.OK);
     }
     @GetMapping("/owner")
-    public ResponseEntity<?> getPropertiesByAgency(Principal principal) {
+        public ResponseEntity<?> getPropertiesByAgency(Principal principal) {
         User agency = userService.getUserByEmail(principal.getName());
         return new ResponseEntity<>(agency, HttpStatus.OK);
     }

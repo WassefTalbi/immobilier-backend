@@ -34,10 +34,14 @@ public class Property {
     private String image;
     private LocalDate createDate;
     private LocalDate updateDate;
+    @Transient
+    private Double averageRating;
     @ManyToOne
     @JsonIgnore
     private User angency;
+    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL)
 
+    private List<Rating> ratings;
     @ManyToMany
     private List<Feature> features;
     @PrePersist
