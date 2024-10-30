@@ -22,17 +22,21 @@ public class RatingService {
     private final UserRepository userRepository;
     private final RatingRepository ratingRepository;
     public Rating rateProperty(Long userId, Long propertyId, Integer score) {
-        System.out.println("userId"+userId+" propertyId "+propertyId+" score" +score);
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Property property = propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new RuntimeException("Property not found"));
 
-        Rating rating = new Rating();
+        Rating rating = ratingRepository.findByUserAndProperty(user, property)
+                .orElse(new Rating());
+
         rating.setUser(user);
         rating.setProperty(property);
         rating.setScore(score);
-
+        Double avg=getAverageRatingForProperty(propertyId);
+        property.setAverageRating(avg);
+        propertyRepository.save(property);
         return ratingRepository.save(rating);
     }
 

@@ -29,13 +29,5 @@ public class RatingController {
         return ratingService.rateProperty(request.getUserId(), request.getPropertyId(), request.getScore());
     }
 
-    @GetMapping("/average")
-    public Property getPropertyWithAverageRating(Long propertyId) {
-        Property property = propertyRepository.findById(propertyId)
-                .orElseThrow(() -> new RuntimeException("Property not found"));
-        Double averageRating = ratingService.getAverageRatingForProperty(propertyId);
-        property.setAverageRating(averageRating);
-        return property;
-    }
 
 }

@@ -34,7 +34,6 @@ public class Property {
     private String image;
     private LocalDate createDate;
     private LocalDate updateDate;
-    @Transient
     private Double averageRating;
     @ManyToOne
     @JsonIgnore
