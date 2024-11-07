@@ -1,15 +1,12 @@
 package OneWayDev.tn.OneWayDev.Service;
 
 import OneWayDev.tn.OneWayDev.Repository.RoleRepository;
-import OneWayDev.tn.OneWayDev.dto.request.AgencyRequest;
-import OneWayDev.tn.OneWayDev.dto.request.AgencyRequestManage;
-import OneWayDev.tn.OneWayDev.dto.request.ClientRegisterRequest;
+import OneWayDev.tn.OneWayDev.dto.request.*;
 import OneWayDev.tn.OneWayDev.entity.MailToken;
 import OneWayDev.tn.OneWayDev.entity.Role;
 import OneWayDev.tn.OneWayDev.entity.User;
 import OneWayDev.tn.OneWayDev.entity.RoleType;
 import OneWayDev.tn.OneWayDev.Repository.UserRepository;
-import OneWayDev.tn.OneWayDev.dto.request.ProfileRequest;
 import OneWayDev.tn.OneWayDev.exception.EmailExistsExecption;
 import OneWayDev.tn.OneWayDev.exception.NotFoundExecption;
 import jakarta.transaction.Transactional;
@@ -112,15 +109,7 @@ public class UserService {
         userRepository.deleteById(idUser);
     }
 
-    public User enabledUser(Long idUser, Boolean enable){
-        Optional<User>  findUser= userRepository.findById(idUser);
-        if (!findUser.isPresent()){
-            throw new NotFoundExecption("no user found");
-        }
-        User user= findUser.get();
-        user.setEnabled(enable);
-        return userRepository.save(user);
-    }
+
     public User blockedUser(Long idUser, Boolean blocked){
         Optional<User>  findUser= userRepository.findById(idUser);
         if (!findUser.isPresent()){
@@ -166,5 +155,43 @@ public class UserService {
         throw new RuntimeException("Failed to store file " + filename, e);
     }
 }
+    public User profileManage(ProfileRequest profileRequest, String email) {
+        try {
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
 
+            user.setFirstName(profileRequest.getFirstName());
+            user.setLastName(profileRequest.getLastName());
+            user.setPhone(profileRequest.getMobileNumber());
+            user.setEmail(profileRequest.getEmail());
+            return userRepository.save(user);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update profile: " + e.getMessage());
+        }
+    }
+    public User profileAgencyManage(ProfileAgencyRequest profileRequest, String email) {
+        try {
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+
+            user.setName(profileRequest.getName());
+            user.setPhone(profileRequest.getMobileNumber());
+            user.setEmail(profileRequest.getEmail());
+            return userRepository.save(user);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update profile: " + e.getMessage());
+        }
+    }
+    public boolean changePassword(String username, String oldPassword, String newPassword) {
+        User user = userRepository.findByEmail(username)
+                .orElseThrow(() -> new NotFoundExecption("User not found"));
+
+        if (bCryptPasswordEncoder.matches(oldPassword, user.getPassword())) {
+            user.setPassword(bCryptPasswordEncoder.encode(newPassword));
+            userRepository.save(user);
+            return true;
+        }
+
+        return false;
+    }
 }

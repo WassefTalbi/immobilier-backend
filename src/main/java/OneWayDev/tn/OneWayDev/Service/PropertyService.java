@@ -85,8 +85,6 @@ public class PropertyService {
         propertyRepository.deleteById(id);
     }
 
-    public void ratingProperty(){
-        //traitement of rating a property
-    }
+
 
 }

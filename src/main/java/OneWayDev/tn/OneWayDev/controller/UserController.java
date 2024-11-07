@@ -1,9 +1,6 @@
 package OneWayDev.tn.OneWayDev.controller;
 
-import OneWayDev.tn.OneWayDev.dto.request.AgencyRequest;
-import OneWayDev.tn.OneWayDev.dto.request.AgencyRequestManage;
-import OneWayDev.tn.OneWayDev.dto.request.ClientRegisterRequest;
-import OneWayDev.tn.OneWayDev.dto.request.CustomErrorResponse;
+import OneWayDev.tn.OneWayDev.dto.request.*;
 import OneWayDev.tn.OneWayDev.entity.User;
 import OneWayDev.tn.OneWayDev.Repository.UserRepository;
 import OneWayDev.tn.OneWayDev.Service.UserService;
@@ -14,12 +11,14 @@ import lombok.AllArgsConstructor;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +51,7 @@ public class UserController {
             return new ResponseEntity<>(new CustomErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @PutMapping("/manage-agence/{idUser}")
     public ResponseEntity<?> manageAgence(@PathVariable(value = "idUser") Long idUser,@ModelAttribute @Valid AgencyRequestManage registerRequestDTO){
         try {
@@ -62,6 +62,7 @@ public class UserController {
             return new ResponseEntity<>(new CustomErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @GetMapping("/all-agency")
     public List<User> getAllAgency(){
         return userService.findAllAgencies();
@@ -97,8 +98,8 @@ public class UserController {
     public ResponseEntity<Map<String, String>> uploadProfilePicture(@RequestParam("file") MultipartFile file, @RequestParam("email") String email) {
         String filePath = userService.uploadFile(file);
         User user = userService.getUserByEmail(email);
-        user.setPhotoProfile(filePath); // assuming User class has a setPhotoProfile method
-        userRepository.save(user); // assuming UserService class has a save method
+        user.setPhotoProfile(filePath);
+        userRepository.save(user);
 
         Map<String, String> responseBody = new HashMap<>();
         responseBody.put("message", "Profile picture updated successfully");
@@ -108,18 +109,50 @@ public class UserController {
     }
 
 
- @GetMapping("/image/{imageName}")
-public ResponseEntity<org.springframework.core.io.Resource> getImage(@PathVariable String imageName) {
-    Path imagePath = Paths.get("src/main/resources/upload").resolve(imageName);
-    try {
-        org.springframework.core.io.Resource resource = new UrlResource(imagePath.toUri());
-        if (resource.exists() || resource.isReadable()) {
-            return ResponseEntity.ok().body(resource);
-        } else {
+     @GetMapping("/image/{imageName}")
+     public ResponseEntity<org.springframework.core.io.Resource> getImage(@PathVariable String imageName) {
+        Path imagePath = Paths.get("src/main/resources/upload").resolve(imageName);
+        try {
+            org.springframework.core.io.Resource resource = new UrlResource(imagePath.toUri());
+            if (resource.exists() || resource.isReadable()) {
+                return ResponseEntity.ok().body(resource);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
-    } catch (Exception e) {
-        return ResponseEntity.notFound().build();
     }
-}
+    @PutMapping("/profile-manage")
+    public ResponseEntity<?> profileManage(@ModelAttribute @Valid ProfileRequest profileRequest, Principal principal){
+        try {
+            return new ResponseEntity<>(userService.profileManage(profileRequest,principal.getName()), HttpStatus.OK);
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(new CustomErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PutMapping("/agency-profile-manage")
+    public ResponseEntity<?> profileAgencyManage(@ModelAttribute @Valid ProfileAgencyRequest profileRequest, Principal principal){
+        try {
+            return new ResponseEntity<>(userService.profileAgencyManage(profileRequest,principal.getName()), HttpStatus.OK);
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new ResponseEntity<>(new CustomErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+        @PostMapping("/change-password")
+    public ResponseEntity<String> changePassword(@RequestBody @Valid ChangePasswordRequest request, Principal principal) {
+        String username = principal.getName();
+        boolean isChanged = userService.changePassword(username, request.getOldPassword(), request.getNewPassword());
+
+        if (isChanged) {
+            return ResponseEntity.ok("Password changed successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to change password");
+        }
+    }
+
 }

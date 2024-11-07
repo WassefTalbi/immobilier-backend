@@ -55,6 +55,7 @@ public class AuthService {
 
     @Value("${infobip.sender-name}")
     private String INFOBIP_SENDER_NAME ;
+    //sing-up user
     public User registerClient(ClientRegisterRequest registerRequestDTO) {
         try{
             if(userRepository.findByEmail(registerRequestDTO.getEmail()).isPresent()){
@@ -97,6 +98,7 @@ public class AuthService {
 
     }
 
+   //login
     public Map<String, String> jwtToken(String username, String password)
     {
 

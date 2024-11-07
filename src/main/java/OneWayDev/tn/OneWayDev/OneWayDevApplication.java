@@ -46,7 +46,7 @@ public class OneWayDevApplication implements CommandLineRunner {
 		}
 
 		if (roleRepository.count() == 0) {
-			Stream.of(RoleType.ADMIN, RoleType.USER)
+			Stream.of(RoleType.ADMIN, RoleType.USER,RoleType.AGENCE)
 					.forEach(roleType -> {
 						Role role = new Role();
 						role.setRoleType(roleType);
